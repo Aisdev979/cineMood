@@ -203,7 +203,7 @@ async function callClaude(moodText){
       'anthropic-dangerous-direct-browser-access':'true'
     },
     body:JSON.stringify({
-      model:'claude-3-haiku-20240307',
+      model:'claude-sonnet-4-5',
       max_tokens:150,
       messages:[{
         role:'user',
