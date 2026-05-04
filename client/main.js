@@ -203,8 +203,8 @@ async function callClaude(moodText){
       'anthropic-dangerous-direct-browser-access':'true'
     },
     body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:600,
+      model:'claude-3-haiku-20240307',
+      max_tokens:150,
       messages:[{
         role:'user',
         content:`Analyze this mood and return ONLY a valid JSON object, no markdown, no explanation:
