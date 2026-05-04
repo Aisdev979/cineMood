@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineMood — Movies for Every Feeling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== SETUP SCREEN ===== -->
+<div id="setup-screen" class="screen active">
+  <div class="setup-card">
+    <div class="logo-mark">
+      <div class="logo-icon">🎬</div>
+      <div class="logo-text">Cine<span>Mood</span></div>
+    </div>
+    <h1 class="setup-title">Welcome! Let's set up.</h1>
+    <p class="setup-sub">CineMood uses AI to understand your feelings and recommend the perfect film. You'll need two free API keys to get started.</p>
+    <div class="field-group">
+      <label class="field-label" for="claude-key">Claude API Key</label>
+      <input type="password" id="claude-key" class="field-input" placeholder="sk-ant-api03-...">
+      <p class="field-hint">Get yours at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="tmdb-key">TMDB API Key</label>
+      <input type="password" id="tmdb-key" class="field-input" placeholder="Your TMDB API key">
+      <p class="field-hint">Free at <a href="https://www.themoviedb.org/settings/api" target="_blank">themoviedb.org/settings/api</a> — takes 1 min</p>
+    </div>
+    <button class="btn-primary" id="setup-btn" onclick="saveSetup()">Continue to CineMood →</button>
+    <div class="divider">your keys are saved locally only</div>
+    <p style="font-size:.8rem;color:var(--text-dim);text-align:center">Keys are stored in your browser's localStorage and never sent anywhere else.</p>
+  </div>
+</div>
+
+<!-- ===== AUTH SCREEN ===== -->
+<div id="auth-screen" class="screen">
+  <div class="auth-left">
+    <div class="film-strips" id="film-strips"></div>
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-icon">🎬</div>
+        <div class="logo-text">Cine<span>Mood</span></div>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="signin-tab" onclick="switchTab('signin')">Sign In</button>
+        <button class="auth-tab" id="signup-tab" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+      <div id="signin-view">
+        <h2 class="auth-title">Welcome back.</h2>
+        <p class="auth-sub">Your next favourite film is waiting.</p>
+      </div>
+      <div id="signup-view" style="display:none">
+        <h2 class="auth-title">Join CineMood.</h2>
+        <p class="auth-sub">Discover films that match how you feel.</p>
+      </div>
+      <div class="field-group" id="signup-name-group">
+        <label class="field-label" for="auth-name">Your Name</label>
+        <input type="text" id="auth-name" class="field-input" placeholder="e.g. Alex">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="auth-email">Email</label>
+        <input type="email" id="auth-email" class="field-input" placeholder="you@example.com">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="auth-password">Password</label>
+        <input type="password" id="auth-password" class="field-input" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" id="auth-btn" onclick="handleAuth()">Sign In</button>
+      <div style="margin-top:1rem"></div>
+      <p class="switch-text" id="switch-text">
+        Don't have an account? <a onclick="switchTab('signup')">Sign up free</a>
+      </p>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="poster-grid" id="poster-showcase"></div>
+  </div>
+</div>
+
+<!-- ===== APP SCREEN ===== -->
+<div id="app-screen" class="screen">
+  <header class="app-header">
+    <div class="header-logo" onclick="resetSearch()">
+      <div class="logo-icon">🎬</div>
+      <div class="logo-text">Cine<span>Mood</span></div>
+    </div>
+    <div class="header-right">
+      <div class="user-pill">
+        <div class="user-avatar" id="user-avatar">U</div>
+        <span id="user-name-display">User</span>
+      </div>
+      <button class="btn-signout" onclick="signOut()">Sign out</button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <div class="hero">
+      <p class="hero-eyebrow">✦ AI-powered film discovery</p>
+      <h1 class="hero-title">How are you feeling<br><em>right now?</em></h1>
+      <p class="hero-sub">Tell us your mood in your own words — we'll find the perfect film for this exact moment.</p>
+
+      <div class="mood-box">
+        <textarea
+          class="mood-textarea"
+          id="mood-input"
+          rows="3"
+          placeholder="e.g. I feel a bit sad and nostalgic, missing someone I love..."
+          onkeydown="handleKey(event)"
+        ></textarea>
+        <div class="mood-footer">
+          <div>
+            <p class="mood-hint" style="margin-bottom:.5rem">Try a mood:</p>
+            <div class="mood-chips">
+              <span class="mood-chip" onclick="setMood(this)">😢 Feeling sad</span>
+              <span class="mood-chip" onclick="setMood(this)">😂 Need a laugh</span>
+              <span class="mood-chip" onclick="setMood(this)">😍 Feeling romantic</span>
+              <span class="mood-chip" onclick="setMood(this)">😱 Want to be scared</span>
+              <span class="mood-chip" onclick="setMood(this)">🤔 Feeling thoughtful</span>
+              <span class="mood-chip" onclick="setMood(this)">⚡ Craving action</span>
+            </div>
+          </div>
+          <button class="btn-analyze" id="analyze-btn" onclick="analyzeMood()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+            Find Films
+          </button>
+        </div>
+      </div>
+
+      <div id="analyzing-state" style="display:none">
+        <div class="analyzing-state">
+          <div class="analyzing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <p style="font-size:.9rem;color:var(--text-muted)" id="analyzing-text">Analyzing your mood with AI...</p>
+        </div>
+      </div>
+
+      <div id="analysis-result" style="display:none"></div>
+    </div>
+
+    <div class="results-section" id="results-section" style="display:none">
+      <div class="section-header">
+        <h2 class="section-title" id="results-title">Films for your mood</h2>
+        <span class="section-count" id="results-count"></span>
+      </div>
+      <div class="movie-grid" id="movie-grid"></div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    Powered by <span>Claude AI</span> &amp; <span>TMDB</span> · CineMood © 2025
+  </footer>
+</div>
+
+<!-- Movie Detail Modal -->
+<div class="modal-overlay" id="movie-modal" onclick="closeModal(event)">
+  <div class="modal" id="modal-content">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Movie Details</span>
+      <button class="modal-close" onclick="document.getElementById('movie-modal').classList.remove('open')">×</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="main.js"></script>
+</body>
+</html>
