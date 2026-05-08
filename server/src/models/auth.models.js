@@ -70,8 +70,6 @@ userSchema.pre("save", async function (next) {
 
   // remove confirm password from DB
   this.passwordConfirm = undefined;
-
-  next();
 });
 
 
