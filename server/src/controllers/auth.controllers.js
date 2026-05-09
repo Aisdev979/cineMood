@@ -19,25 +19,21 @@ export const registerUser = async (req, res) => {
         })
     }
 
-    //check if passwords match
-    if(password !== passwordConfirm) {
-        return res.status(400).json({
-            success: false,
-            message: 'Passwords do not match'
-        })
-    }
-
-    //if there isn't, create a new user and save it to the database
-    const newUser = await User.create({ name, email, password, passwordConfirm });
+    // //check if passwords match
+    // if(password !== passwordConfirm) {
+    //     return res.status(400).json({
+    //         success: false,
+    //         message: 'Passwords do not match'
+    //     })
+    // }
 
     //send otp email
     const otp = generateOTP();
 
-    newUser.otp = otp;
+    const otpExpires = Date.now() + 5 * 60 * 1000; // 5 mins
 
-    newUser.otpExpires = Date.now() + 5 * 60 * 1000; // 5 mins
-
-    await newUser.save();
+    //if there isn't, create a new user and save it to the database
+    const newUser = await User.create({ name, email, password, passwordConfirm, otp, otpExpires });
 
     await sendOTPEmail(email, otp);
 

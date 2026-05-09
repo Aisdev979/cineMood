@@ -5,45 +5,37 @@ const client = SibApiV3Sdk.ApiClient.instance;
 const apiKey = client.authentications["api-key"];
 apiKey.apiKey = process.env.BREVO_API_KEY;
 
+console.log(process.env.BREVO_API_KEY);
+
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-
-
 
 const sender = {
   email: "aisdev99@gmail.com",
   name: "CineMood",
 };
 
-
-// SEND OTP EMAIL
 export const sendOTPEmail = async (to, otp) => {
   try {
-    await apiInstance.sendTransacEmail({
+    const response = await apiInstance.sendTransacEmail({
       sender,
       to: [{ email: to }],
       subject: "Your OTP Code",
       htmlContent: `
-        <div style="font-family:sans-serif">
+        <div>
           <h2>Verify Your Account</h2>
-          <p>Your OTP code is:</p>
-
-          <div style="
-            font-size:32px;
-            font-weight:bold;
-            letter-spacing:5px;
-            margin:20px 0;
-          ">
-            ${otp}
-          </div>
-
-          <p>This code expires in 5 minutes.</p>
+          <p>Your OTP is:</p>
+          <h1>${otp}</h1>
         </div>
       `,
     });
 
-    console.log("OTP email sent", otp);
+    console.log("EMAIL SENT:", response);
   } catch (error) {
-    console.error(error);
+    console.error(
+      "BREVO ERROR:",
+      error.response?.body || error.message || error
+    );
+
     throw new Error("Failed to send OTP email");
   }
 };

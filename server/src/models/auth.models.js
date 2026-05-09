@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema(
       required: [true, "Please confirm your password"],
       validate: {
         validator: function (el) {
+          console.log(el, this.password);
           return el === this.password;
         },
         message: "Passwords do not match",
@@ -65,11 +66,11 @@ const userSchema = new mongoose.Schema(
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
-  const salt = await bcrypt.genSalt(12);
-  this.password = await bcrypt.hash(this.password, salt);
-
   // remove confirm password from DB
   this.passwordConfirm = undefined;
+
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 
