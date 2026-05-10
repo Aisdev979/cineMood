@@ -1,24 +1,14 @@
-import SibApiV3Sdk from "sib-api-v3-sdk";
+import { BrevoClient } from '@getbrevo/brevo';
+import dotenv from "dotenv";
 
-const client = SibApiV3Sdk.ApiClient.instance;
+dotenv.config();
 
-const apiKey = client.authentications["api-key"];
-apiKey.apiKey = process.env.BREVO_API_KEY;
+const brevo = new BrevoClient({ apiKey: process.env.BREVO_API_KEY });
 
-console.log(process.env.BREVO_API_KEY);
-
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-
-const sender = {
-  email: "aisdev99@gmail.com",
-  name: "CineMood",
-};
 
 export const sendOTPEmail = async (to, otp) => {
   try {
-    const response = await apiInstance.sendTransacEmail({
-      sender,
-      to: [{ email: to }],
+    const response = await brevo.transactionalEmails.sendTransacEmail({
       subject: "Your OTP Code",
       htmlContent: `
         <div>
@@ -27,9 +17,12 @@ export const sendOTPEmail = async (to, otp) => {
           <h1>${otp}</h1>
         </div>
       `,
+      sender: { name: 'CineMood.ai', email: 'aisosamatthew247@gmail.com' },
+      to: [{ email: to}],
     });
 
     console.log("EMAIL SENT:", response);
+    console.log('Email sent. Message ID:', response.messageId);
   } catch (error) {
     console.error(
       "BREVO ERROR:",

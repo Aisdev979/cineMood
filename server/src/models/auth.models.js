@@ -31,14 +31,13 @@ const userSchema = new mongoose.Schema(
 
     passwordConfirm: {
       type: String,
-      required: [true, "Please confirm your password"],
       validate: {
         validator: function (el) {
-          console.log(el, this.password);
           return el === this.password;
         },
         message: "Passwords do not match",
       },
+      select: false,
     },
 
     otp: {
@@ -63,14 +62,12 @@ const userSchema = new mongoose.Schema(
 /* =========================
    PASSWORD HASHING & SALTING & REMOVAL OF CONFIRM PASSWORD
 ========================= */
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
-  // remove confirm password from DB
+  this.password = await bcrypt.hash(this.password, 12);
+
   this.passwordConfirm = undefined;
-
-  const salt = await bcrypt.genSalt(12);
-  this.password = await bcrypt.hash(this.password, salt);
 });
 
 
