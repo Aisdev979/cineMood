@@ -8,6 +8,8 @@ dotenv.config();
 
 const app = express();
 
+app.use(cookieParser());
+
 app.use(
   cors({
     origin: "http://127.0.0.1:5500",
@@ -16,7 +18,6 @@ app.use(
 );
   
 app.use(express.json());
-app.use(cookieParser());
 app.use("/api/v1", authRouter);
 
 // Example route
