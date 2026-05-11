@@ -149,29 +149,19 @@ export const verifyOtp = async (req, res) => {
 
 export const me = async (req, res) => {
   try {
-    const token = req.cookies.accessToken;
+    const { userId } = req.user;
+    const user = User.findById(userId);
 
-    if (!token) {
-      return res.status(401).json({ message: "No access token" });
+    if(!user) {
+        return res.status(404).json({
+            status: false,
+            message: "User not found"
+        })
     }
-
-    const decoded = jwt.verify(
-      token,
-      process.env.ACCESS_TOKEN_SECRET
-    );
-
-    const user = await User.findById(decoded.userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
+      
     return res.json({
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
+      status: true,
+      user
     });
   } catch (err) {
     return res.status(401).json({ message: "Invalid token" });
