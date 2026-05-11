@@ -134,46 +134,38 @@ const API = {
   // },
 
   async _request(method, path, body = null) {
-    const opts = {
-      method,
+  const opts = {
+    method,
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+  };
+  if (body) opts.body = JSON.stringify(body);
+
+  let res = await fetch(CFG.API_BASE + path, opts);
+
+  // If access token expired, try to refresh once
+  if (res.status === 401) {
+    const refreshRes = await fetch(`${CFG.API_BASE}/refresh`, {
+      method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
-    };
+    });
 
-    if (body) opts.body = JSON.stringify(body);
-
-    let res = await fetch(CFG.API_BASE + path, opts);
-
-    // 🔥 TRY REFRESH ONCE
-    if (res.status === 401) {
-      const refreshRes = await fetch(
-        CFG.API_BASE + "/refresh",
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
-
-      if (refreshRes.ok) {
-        // retry original request
-        res = await fetch(CFG.API_BASE + path, opts);
-      }
+    if (refreshRes.ok) {
+      // Retry original request — browser now has new accessToken cookie
+      res = await fetch(CFG.API_BASE + path, opts);
     }
+  }
 
-    if (res.status === 401) {
-      State.user = null;
-      Views.show("auth");
-      throw new Error("Session expired");
-    }
+  if (res.status === 401) {
+    State.user = null;
+    Views.show("auth");
+    throw new Error("Session expired. Please sign in again.");
+  }
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.message || "Error");
-    }
-
-    return data;
-  },
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Request failed");
+  return data;
+},
 
   get: (path) => API._request("GET", path),
   post: (path, body) => API._request("POST", path, body),
