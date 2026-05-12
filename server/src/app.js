@@ -10,11 +10,22 @@ const app = express();
 
 app.use(cookieParser());
 
+const allowedOrigins = ["http://127.0.0.1:5500", "https://aisdev979.github.io/cineMood"];
+
+const options = {
+  origin: (origin, callback) => {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+};
+
+
 app.use(
-  cors({
-    origin: ["http://127.0.0.1:5500", "https://aisdev979.github.io/cineMood/"],
-    credentials: true,
-  })
+  cors(options)
 );
   
 app.use(express.json());
