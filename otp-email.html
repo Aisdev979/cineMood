@@ -1,0 +1,706 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<!--
+  ╔═══════════════════════════════════════════════════════════════╗
+  ║       CINEMOOD — OTP VERIFICATION EMAIL  (Responsive v2)     ║
+  ╠═══════════════════════════════════════════════════════════════╣
+  ║  Template variables (replace server-side before sending):    ║
+  ║                                                              ║
+  ║   {{USER_NAME}}  → first name            e.g. "Sarah"        ║
+  ║   {{OTP_D1}}     → digit 1               e.g. "4"            ║
+  ║   {{OTP_D2}}     → digit 2               e.g. "8"            ║
+  ║   {{OTP_D3}}     → digit 3               e.g. "2"            ║
+  ║   {{OTP_D4}}     → digit 4               e.g. "0"            ║
+  ║   {{OTP_D5}}     → digit 5               e.g. "5"            ║
+  ║   {{OTP_D6}}     → digit 6               e.g. "1"            ║
+  ║   {{OTP_CODE}}   → full 6-digit string   e.g. "482051"       ║
+  ║   {{YEAR}}       → current year          e.g. "2026"         ║
+  ╠═══════════════════════════════════════════════════════════════╣
+  ║  Responsiveness:                                             ║
+  ║  • Outlook desktop  →  Conditional comments lock to 580px    ║
+  ║  • Modern clients   →  Fluid + two media-query breakpoints   ║
+  ║    – ≤ 580px  (tablet / large phone)                         ║
+  ║    – ≤ 400px  (small phone: iPhone SE, Galaxy A)             ║
+  ║  • 3-col fact cards → display:block stacking on mobile       ║
+  ║  • OTP digits       → shrink at both breakpoints             ║
+  ║  • Footer links     → stack vertically on mobile             ║
+  ║  • All critical styles are ALSO inline for Gmail strip       ║
+  ╚═══════════════════════════════════════════════════════════════╝
+-->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="x-apple-disable-message-reformatting" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="supported-color-schemes" content="dark" />
+  <title>Your CineMood Verification Code</title>
+
+  <style type="text/css">
+
+    /* ── RESET ──────────────────────────────────────── */
+    body,table,td,a { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+    table,td        { mso-table-lspace:0pt; mso-table-rspace:0pt; }
+    img             { -ms-interpolation-mode:bicubic; border:0; display:block; }
+
+    /* ── DARK MODE ──────────────────────────────────── */
+    @media (prefers-color-scheme: dark) {
+      body           { background-color:#080c1a !important; }
+      .email-wrapper { background-color:#080c1a !important; }
+      .email-card    { background-color:#0c1020 !important; }
+    }
+
+    /* ── HOVER (clients that support it) ────────────── */
+    .footer-link:hover { color:#e8a020 !important; opacity:1 !important; }
+
+    /* ════════════════════════════════════════════════════
+       BREAKPOINT 1  ≤ 580px  — tablet / large phone
+       Supported: Gmail Android, Apple Mail, Outlook.com,
+                  Yahoo Mail, Samsung Mail, Thunderbird
+    ════════════════════════════════════════════════════ */
+    @media only screen and (max-width:580px) {
+
+      /* Card goes full-width, no side rounded corners */
+      .email-card {
+        width:100% !important;
+        border-radius:0 !important;
+      }
+
+      /* Side padding narrows */
+      .content-pad {
+        padding-left:24px !important;
+        padding-right:24px !important;
+      }
+
+      /* Heading shrinks */
+      .hero-heading {
+        font-size:23px !important;
+        line-height:1.25 !important;
+      }
+
+      /* OTP digits: 48px → 40px */
+      .otp-digit {
+        width:40px !important;
+        height:52px !important;
+        font-size:23px !important;
+      }
+      .otp-gap-cell { width:6px !important; }
+      .otp-sep-cell { padding:0 7px !important; font-size:18px !important; }
+
+      /* Expiry pill: smaller font so it stays on one line longer */
+      .expiry-badge { font-size:11px !important; }
+
+      /* ── 3-col facts → single-column stack ──────────
+         Technique: display:block on <tr> and <td>.
+         Outlook desktop ignores this (always shows 3-col,
+         which is fine because Outlook is always on desktop). */
+      .fact-row  { display:block !important; width:100% !important; }
+      .fact-col  {
+        display:block !important;
+        width:100% !important;
+        max-width:100% !important;
+        padding:0 0 10px !important;
+        box-sizing:border-box !important;
+      }
+      .fact-inner { width:100% !important; }
+
+      /* ── Footer links → stack vertically ────────────
+         Remove pipe dividers, show bottom-border separators */
+      .ftr-row       { display:block !important; }
+      .ftr-link-cell {
+        display:block !important;
+        width:100% !important;
+        padding:8px 0 !important;
+        border-right:none !important;
+        border-bottom:1px solid #1a1f35 !important;
+        text-align:center !important;
+      }
+      .ftr-link-cell:last-child { border-bottom:none !important; }
+      .ftr-link-cell a          { display:block !important; }
+
+      /* Below-card note goes full-width */
+      .below-card { width:100% !important; }
+    }
+
+    /* ════════════════════════════════════════════════════
+       BREAKPOINT 2  ≤ 400px  — small phone
+       (iPhone SE 375px, Galaxy A32 360px, Moto G 360px)
+    ════════════════════════════════════════════════════ */
+    @media only screen and (max-width:400px) {
+
+      /* Wrapper padding: 0 so card reaches full edge */
+      .outer-td { padding-left:0 !important; padding-right:0 !important; }
+
+      /* Strip all rounded corners at full bleed */
+      .email-card {
+        border-left:none !important;
+        border-right:none !important;
+      }
+
+      /* Heading shrinks further */
+      .hero-heading { font-size:20px !important; }
+
+      /* Content padding tightens */
+      .content-pad {
+        padding-left:16px !important;
+        padding-right:16px !important;
+      }
+
+      /* OTP digits: 40px → 33px  — maths for 360px safe zone:
+         6 × 33px = 198px  +  5 × 4px gaps = 20px
+         + separator ~28px  +  2 × 16px padding = 32px
+         Total ≈ 278px  <  328px available ✓ */
+      .otp-digit {
+        width:33px !important;
+        height:43px !important;
+        font-size:19px !important;
+        border-radius:8px !important;
+      }
+      .otp-gap-cell { width:4px !important; }
+      .otp-sep-cell { padding:0 5px !important; font-size:15px !important; }
+
+      /* Fallback code: slightly larger for readability */
+      .fallback-code {
+        font-size:20px !important;
+        letter-spacing:0.28em !important;
+      }
+    }
+
+  </style>
+</head>
+
+<body style="margin:0; padding:0; background-color:#080c1a;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased; mso-line-height-rule:exactly;">
+
+<!-- ═══════════════════════════════════════════════════
+     OUTER WRAPPER  — always 100% wide, dark bg
+════════════════════════════════════════════════════════ -->
+<table class="email-wrapper" role="presentation"
+  cellpadding="0" cellspacing="0" border="0"
+  width="100%" bgcolor="#080c1a"
+  style="width:100%; background-color:#080c1a;">
+  <tr>
+    <td class="outer-td" align="center"
+      style="padding:36px 16px 48px;">
+
+      <!-- Outlook conditional: force 580px fixed width on desktop Outlook -->
+      <!--[if (gte mso 9)|(IE)]>
+      <table role="presentation" cellpadding="0" cellspacing="0"
+        border="0" width="580" align="center"><tr><td>
+      <![endif]-->
+
+      <!-- ════════════════════════════════════════════
+           EMAIL CARD  — fluid, max 580px
+      ════════════════════════════════════════════════ -->
+      <table class="email-card" role="presentation"
+        cellpadding="0" cellspacing="0" border="0"
+        width="100%" bgcolor="#0c1020"
+        style="max-width:580px; width:100%;
+          background-color:#0c1020;
+          border-radius:20px;
+          border:1px solid rgba(255,255,255,0.07);">
+
+        <!-- GOLD TOP BAR -->
+        <tr>
+          <td style="padding:0; font-size:0; line-height:0;
+            border-radius:20px 20px 0 0; overflow:hidden;">
+            <table role="presentation" cellpadding="0"
+              cellspacing="0" border="0" width="100%">
+              <tr>
+                <td height="4" bgcolor="#e8a020"
+                  style="background:linear-gradient(90deg,#c4861a,#e8a020 45%,#f5be46);
+                    background-color:#e8a020;
+                    font-size:0; line-height:4px;">&nbsp;</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- BRAND LOGO -->
+        <tr>
+          <td class="content-pad" align="center"
+            style="padding:32px 40px 0;">
+            <table role="presentation" cellpadding="0"
+              cellspacing="0" border="0">
+              <tr>
+                <td align="center"
+                  style="background-color:rgba(232,160,32,0.09);
+                    border:1px solid rgba(232,160,32,0.26);
+                    border-radius:50px; padding:10px 22px;">
+                  <span style="font-size:19px; vertical-align:middle;">🎬</span>
+                  <span style="font-size:19px; font-weight:800;
+                    color:#edf0fa; letter-spacing:-0.03em;
+                    vertical-align:middle; margin-left:7px;">CineMood</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ENVELOPE + HEADING -->
+        <tr>
+          <td class="content-pad" align="center"
+            style="padding:30px 40px 0;">
+
+            <!-- Envelope icon -->
+            <table role="presentation" cellpadding="0"
+              cellspacing="0" border="0" style="margin:0 auto 20px;">
+              <tr>
+                <td align="center" bgcolor="#131929"
+                  style="background-color:#131929;
+                    border:2px solid rgba(232,160,32,0.3);
+                    border-radius:50%; width:68px; height:68px;
+                    text-align:center; vertical-align:middle;">
+                  <span style="font-size:32px; line-height:68px;
+                    display:block;">✉️</span>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Badge -->
+            <table role="presentation" cellpadding="0"
+              cellspacing="0" border="0" style="margin:0 auto 18px;">
+              <tr>
+                <td align="center"
+                  style="background-color:rgba(232,160,32,0.08);
+                    border:1px solid rgba(232,160,32,0.22);
+                    border-radius:50px; padding:5px 16px;">
+                  <span style="font-size:11px; font-weight:700;
+                    letter-spacing:0.12em; color:#e8a020;
+                    text-transform:uppercase;">✦ Email Verification</span>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Heading -->
+            <h1 class="hero-heading" style="margin:0 0 14px; padding:0;
+              font-size:27px; font-weight:800; color:#edf0fa;
+              letter-spacing:-0.03em; line-height:1.2;
+              mso-line-height-rule:exactly;">
+              Your verification code
+            </h1>
+
+            <!-- Greeting -->
+            <p style="margin:0 0 6px; font-size:15px;
+              color:#8a93b8; line-height:1.6;">
+              Hi <strong style="color:#c8ccdf;">{{USER_NAME}}</strong> 👋
+            </p>
+            <p style="margin:0; font-size:14.5px;
+              color:#8a93b8; line-height:1.65;">
+              Enter the code below to verify your CineMood account.
+              <br>It is valid for the next
+              <strong style="color:#e8a020;">15 minutes</strong>.
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- OTP DIGIT BOXES -->
+        <tr>
+          <td class="content-pad" align="center"
+            style="padding:30px 40px 10px;">
+
+            <!--
+              Digit sizing at each breakpoint:
+                ≥580px  →  48 × 58px  (inline style)
+                ≤580px  →  40 × 52px  (media query)
+                ≤400px  →  33 × 43px  (media query)
+
+              Gap cells and the separator also shrink via media queries.
+              The HTML width="" attribute is intentionally omitted from
+              .otp-digit cells so CSS can override freely on mobile.
+            -->
+            <table role="presentation" cellpadding="0"
+              cellspacing="0" border="0" style="margin:0 auto;">
+              <tr valign="middle">
+
+                <td class="otp-gap-cell" width="8"
+                  style="width:8px; font-size:0; line-height:0;">&nbsp;</td>
+
+                <td class="otp-digit" align="center" bgcolor="#111827"
+                  style="width:48px; height:58px;
+                    background-color:#111827;
+                    border:2px solid rgba(232,160,32,0.55);
+                    border-radius:12px; font-size:28px; font-weight:800;
+                    color:#e8a020; text-align:center; vertical-align:middle;
+                    font-family:'Courier New',Courier,monospace;
+                    letter-spacing:0;">{{OTP_D1}}</td>
+
+                <td class="otp-gap-cell" width="8"
+                  style="width:8px; font-size:0; line-height:0;">&nbsp;</td>
+
+                <td class="otp-digit" align="center" bgcolor="#111827"
+                  style="width:48px; height:58px;
+                    background-color:#111827;
+                    border:2px solid rgba(232,160,32,0.55);
+                    border-radius:12px; font-size:28px; font-weight:800;
+                    color:#e8a020; text-align:center; vertical-align:middle;
+                    font-family:'Courier New',Courier,monospace;
+                    letter-spacing:0;">{{OTP_D2}}</td>
+
+                <td class="otp-gap-cell" width="8"
+                  style="width:8px; font-size:0; line-height:0;">&nbsp;</td>
+
+                <td class="otp-digit" align="center" bgcolor="#111827"
+                  style="width:48px; height:58px;
+                    background-color:#111827;
+                    border:2px solid rgba(232,160,32,0.55);
+                    border-radius:12px; font-size:28px; font-weight:800;
+                    color:#e8a020; text-align:center; vertical-align:middle;
+                    font-family:'Courier New',Courier,monospace;
+                    letter-spacing:0;">{{OTP_D3}}</td>
+
+                <!-- Separator -->
+                <td class="otp-sep-cell" align="center"
+                  style="padding:0 10px; color:#4d5578;
+                    font-size:22px; font-weight:700;
+                    vertical-align:middle; line-height:1;">—</td>
+
+                <td class="otp-digit" align="center" bgcolor="#111827"
+                  style="width:48px; height:58px;
+                    background-color:#111827;
+                    border:2px solid rgba(232,160,32,0.55);
+                    border-radius:12px; font-size:28px; font-weight:800;
+                    color:#e8a020; text-align:center; vertical-align:middle;
+                    font-family:'Courier New',Courier,monospace;
+                    letter-spacing:0;">{{OTP_D4}}</td>
+
+                <td class="otp-gap-cell" width="8"
+                  style="width:8px; font-size:0; line-height:0;">&nbsp;</td>
+
+                <td class="otp-digit" align="center" bgcolor="#111827"
+                  style="width:48px; height:58px;
+                    background-color:#111827;
+                    border:2px solid rgba(232,160,32,0.55);
+                    border-radius:12px; font-size:28px; font-weight:800;
+                    color:#e8a020; text-align:center; vertical-align:middle;
+                    font-family:'Courier New',Courier,monospace;
+                    letter-spacing:0;">{{OTP_D5}}</td>
+
+                <td class="otp-gap-cell" width="8"
+                  style="width:8px; font-size:0; line-height:0;">&nbsp;</td>
+
+                <td class="otp-digit" align="center" bgcolor="#111827"
+                  style="width:48px; height:58px;
+                    background-color:#111827;
+                    border:2px solid rgba(232,160,32,0.55);
+                    border-radius:12px; font-size:28px; font-weight:800;
+                    color:#e8a020; text-align:center; vertical-align:middle;
+                    font-family:'Courier New',Courier,monospace;
+                    letter-spacing:0;">{{OTP_D6}}</td>
+
+                <td class="otp-gap-cell" width="8"
+                  style="width:8px; font-size:0; line-height:0;">&nbsp;</td>
+
+              </tr>
+            </table>
+
+          </td>
+        </tr>
+
+        <!-- EXPIRY BADGE -->
+        <tr>
+          <td class="content-pad" align="center"
+            style="padding:16px 40px 0;">
+            <table role="presentation" cellpadding="0"
+              cellspacing="0" border="0" style="margin:0 auto;">
+              <tr>
+                <td class="expiry-badge" align="center"
+                  style="background-color:rgba(239,68,68,0.09);
+                    border:1px solid rgba(239,68,68,0.28);
+                    border-radius:50px; padding:7px 18px;
+                    font-size:12px; font-weight:600;
+                    color:#f87171; letter-spacing:0.02em;
+                    white-space:nowrap;">
+                  ⏱&nbsp; Expires in 15 minutes &mdash; do not share this code
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- PLAIN-TEXT FALLBACK CODE -->
+        <tr>
+          <td class="content-pad" align="center"
+            style="padding:16px 40px 0;">
+            <p style="margin:0; font-size:12px;
+              color:#4d5578; line-height:1.5;">
+              Digits not rendering correctly? Copy this code instead:
+            </p>
+            <p class="fallback-code"
+              style="margin:6px 0 0; font-size:22px; font-weight:800;
+                color:#8a93b8; letter-spacing:0.35em;
+                font-family:'Courier New',Courier,monospace;">
+              {{OTP_CODE}}
+            </p>
+          </td>
+        </tr>
+
+        <!-- DIVIDER -->
+        <tr>
+          <td class="content-pad" style="padding:26px 40px 0;">
+            <table role="presentation" cellpadding="0"
+              cellspacing="0" border="0" width="100%">
+              <tr>
+                <td height="1" bgcolor="#1a1f35"
+                  style="background-color:#1a1f35;
+                    font-size:0; line-height:0;">&nbsp;</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- SECURITY NOTICE -->
+        <tr>
+          <td class="content-pad" style="padding:22px 40px 0;">
+            <table role="presentation" cellpadding="0"
+              cellspacing="0" border="0" width="100%"
+              bgcolor="#111827"
+              style="background-color:rgba(255,255,255,0.03);
+                border:1px solid rgba(255,255,255,0.06);
+                border-radius:14px;">
+              <tr>
+                <td style="padding:18px 20px;">
+                  <table role="presentation" cellpadding="0"
+                    cellspacing="0" border="0" width="100%">
+                    <tr valign="top">
+                      <td width="30" style="padding-right:12px; padding-top:2px;">
+                        <span style="font-size:20px;">🛡️</span>
+                      </td>
+                      <td>
+                        <p style="margin:0 0 5px; font-size:13px;
+                          font-weight:700; color:#c8ccdf;">Security notice</p>
+                        <p style="margin:0; font-size:12.5px;
+                          color:#6b7494; line-height:1.65;">
+                          CineMood will
+                          <strong style="color:#8a93b8;">never</strong>
+                          ask for your verification code via phone, chat, or any
+                          other channel. If you didn't request this, simply ignore
+                          this email &mdash; the code will expire automatically.
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- 3-COL FACT CARDS
+             Desktop:  3 columns  (Outlook always sees this)
+             ≤580px:   .fact-col → display:block → single column stack
+        -->
+        <tr>
+          <td class="content-pad" style="padding:18px 40px 0;">
+            <table role="presentation" cellpadding="0"
+              cellspacing="0" border="0" width="100%">
+              <tr class="fact-row">
+
+                <!-- Fact 1 — One-time -->
+                <td class="fact-col" valign="top" width="33%"
+                  style="width:33%; padding:0 5px 0 0; vertical-align:top;">
+                  <table class="fact-inner" role="presentation"
+                    cellpadding="0" cellspacing="0" border="0"
+                    width="100%" bgcolor="#111827"
+                    style="width:100%; background-color:#111827;
+                      border:1px solid rgba(255,255,255,0.07);
+                      border-radius:12px;">
+                    <tr>
+                      <td align="center" style="padding:16px 10px;">
+                        <p style="margin:0; font-size:20px; line-height:1;">🔢</p>
+                        <p style="margin:7px 0 3px; font-size:10.5px;
+                          font-weight:700; color:#e8a020;
+                          text-transform:uppercase; letter-spacing:0.07em;">
+                          One-time
+                        </p>
+                        <p style="margin:0; font-size:11px;
+                          color:#4d5578; line-height:1.4;">
+                          Single use<br>only
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+
+                <!-- Fact 2 — 15 Minutes (highlighted centre card) -->
+                <td class="fact-col" valign="top" width="34%"
+                  style="width:34%; padding:0 5px; vertical-align:top;">
+                  <table class="fact-inner" role="presentation"
+                    cellpadding="0" cellspacing="0" border="0"
+                    width="100%" bgcolor="#131929"
+                    style="width:100%; background-color:#131929;
+                      border:1px solid rgba(232,160,32,0.22);
+                      border-radius:12px;">
+                    <tr>
+                      <td align="center" style="padding:16px 10px;">
+                        <p style="margin:0; font-size:20px; line-height:1;">⏱️</p>
+                        <p style="margin:7px 0 3px; font-size:10.5px;
+                          font-weight:700; color:#e8a020;
+                          text-transform:uppercase; letter-spacing:0.07em;">
+                          15 Minutes
+                        </p>
+                        <p style="margin:0; font-size:11px;
+                          color:#4d5578; line-height:1.4;">
+                          Expires after<br>15 min
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+
+                <!-- Fact 3 — Private -->
+                <td class="fact-col" valign="top" width="33%"
+                  style="width:33%; padding:0 0 0 5px; vertical-align:top;">
+                  <table class="fact-inner" role="presentation"
+                    cellpadding="0" cellspacing="0" border="0"
+                    width="100%" bgcolor="#111827"
+                    style="width:100%; background-color:#111827;
+                      border:1px solid rgba(255,255,255,0.07);
+                      border-radius:12px;">
+                    <tr>
+                      <td align="center" style="padding:16px 10px;">
+                        <p style="margin:0; font-size:20px; line-height:1;">🔒</p>
+                        <p style="margin:7px 0 3px; font-size:10.5px;
+                          font-weight:700; color:#e8a020;
+                          text-transform:uppercase; letter-spacing:0.07em;">
+                          Private
+                        </p>
+                        <p style="margin:0; font-size:11px;
+                          color:#4d5578; line-height:1.4;">
+                          Never share<br>this code
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- DIVIDER -->
+        <tr>
+          <td class="content-pad" style="padding:26px 40px 0;">
+            <table role="presentation" cellpadding="0"
+              cellspacing="0" border="0" width="100%">
+              <tr>
+                <td height="1" bgcolor="#1a1f35"
+                  style="background-color:#1a1f35;
+                    font-size:0; line-height:0;">&nbsp;</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td class="content-pad" align="center"
+            style="padding:24px 40px 30px;">
+
+            <!-- Brand -->
+            <p style="margin:0 0 3px; font-size:14px;
+              font-weight:700; color:#4d5578;">
+              🎬 <span style="color:#6b7494;">CineMood</span>
+            </p>
+            <p style="margin:0 0 18px; font-size:11px;
+              color:#2d3355; letter-spacing:0.06em;
+              text-transform:uppercase;">
+              AI-Powered Film Discovery
+            </p>
+
+            <!-- Footer links
+                 Desktop: inline 3-cell row with pipe dividers
+                 ≤580px:  .ftr-link-cell stacks via display:block
+            -->
+            <table role="presentation" cellpadding="0"
+              cellspacing="0" border="0"
+              style="margin:0 auto 18px;">
+              <tr class="ftr-row">
+                <td class="ftr-link-cell" align="center"
+                  style="padding:0 12px 0 0;
+                    border-right:1px solid #1a1f35;">
+                  <a href="#" class="footer-link"
+                    style="font-size:12px; color:#3a4060;
+                      text-decoration:none; font-weight:500;">
+                    Privacy Policy
+                  </a>
+                </td>
+                <td class="ftr-link-cell" align="center"
+                  style="padding:0 12px;
+                    border-right:1px solid #1a1f35;">
+                  <a href="#" class="footer-link"
+                    style="font-size:12px; color:#3a4060;
+                      text-decoration:none; font-weight:500;">
+                    Terms of Service
+                  </a>
+                </td>
+                <td class="ftr-link-cell" align="center"
+                  style="padding:0 0 0 12px;">
+                  <a href="#" class="footer-link"
+                    style="font-size:12px; color:#3a4060;
+                      text-decoration:none; font-weight:500;">
+                    Help Centre
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Legal text -->
+            <p style="margin:0 0 12px; font-size:11px;
+              color:#2d3355; line-height:1.65;">
+              You're receiving this because an account was created at
+              CineMood using this email address. If this wasn't you,
+              no action is needed &mdash; the code expires automatically.
+            </p>
+            <p style="margin:0; font-size:11px; color:#1e2440;">
+              &copy; {{YEAR}} CineMood. All rights reserved.
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- GOLD BOTTOM BAR -->
+        <tr>
+          <td height="4" bgcolor="#e8a020"
+            style="background:linear-gradient(90deg,#f5be46,#e8a020 50%,#c4861a);
+              background-color:#e8a020;
+              font-size:0; line-height:4px;
+              border-radius:0 0 20px 20px;">&nbsp;</td>
+        </tr>
+
+      </table>
+      <!-- /email-card -->
+
+      <!--[if (gte mso 9)|(IE)]>
+        </td></tr>
+      </table>
+      <![endif]-->
+
+      <!-- BELOW-CARD NOTE (fluid) -->
+      <table class="below-card" role="presentation"
+        cellpadding="0" cellspacing="0" border="0"
+        width="100%" style="max-width:580px; width:100%;">
+        <tr>
+          <td class="content-pad" align="center"
+            style="padding:20px 24px 0;">
+            <p style="margin:0; font-size:11.5px;
+              color:#2d3355; line-height:1.65;">
+              This is an automated message &mdash; please do not reply.<br>
+              Having trouble?
+              <a href="#" style="color:#4d5578; text-decoration:underline;">
+                Contact support
+              </a>
+            </p>
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+<!-- /outer wrapper -->
+
+</body>
+</html>
