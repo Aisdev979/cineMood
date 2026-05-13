@@ -95,44 +95,6 @@ const Sec = {
    API MODULE
    ════════════════════════════════════════════════ */
 const API = {
-  // async _request(method, path, body = null) {
-  //   const opts = {
-  //     method,
-  //     credentials: "include", // Send HttpOnly cookies automatically
-  //     headers: { "Content-Type": "application/json" },
-  //   };
-  //   if (body) opts.body = JSON.stringify(body);
-
-  //   let res;
-  //   try {
-  //     res = await fetch(CFG.API_BASE + path, opts);
-  //   } catch (err) {
-  //     throw new Error("Network error — please check your connection.");
-  //   }
-
-  //   // Session expired or unauthorised → kick to auth
-  //   if (res.status === 401) {
-  //     State.user = null;
-  //     Views.show("auth");
-  //     throw new Error("Session expired. Please sign in again.");
-  //   }
-
-  //   let data;
-  //   try {
-  //     data = await res.json();
-  //   } catch {
-  //     throw new Error("Unexpected server response.");
-  //   }
-
-  //   if (!res.ok) {
-  //     throw new Error(
-  //       data?.message || data?.error || `Server error (${res.status}).`,
-  //     );
-  //   }
-
-  //   return data;
-  // },
-
   async _request(method, path, body = null) {
   const opts = {
     method,
@@ -197,14 +159,14 @@ const API = {
   },
   getMovies(genreId, page) {
     return API.get(
-      `/movies?genreId=${encodeURIComponent(genreId)}&page=${encodeURIComponent(page)}`,
+      `/mood/movies?genreId=${encodeURIComponent(genreId)}&page=${encodeURIComponent(page)}`,
     );
   },
   getMovie(id) {
-    return API.get(`/movies/${encodeURIComponent(id)}`);
+    return API.get(`/mood/movies/${encodeURIComponent(id)}`);
   },
   getVideos(id) {
-    return API.get(`/movies/${encodeURIComponent(id)}/videos`);
+    return API.get(`/mood/movies/${encodeURIComponent(id)}/videos`);
   },
 };
 
@@ -683,6 +645,7 @@ const Home = {
     let moodData;
     try {
       moodData = await API.analyzeMood(text);
+      console.log("Mood analysis result:", moodData);
     } catch (err) {
       Toast.dismiss(t1);
       Toast.error("Analysis failed", err.message);
@@ -694,13 +657,13 @@ const Home = {
     /* Show detected mood */
     State.moodAnalysis = moodData;
     Toast.success(
-      `Mood detected: ${Sec.trunc(moodData.moodLabel, 30)}`,
-      Sec.trunc(moodData.moodDescription, 100),
+      `Mood detected: ${Sec.trunc(moodData.mood, 30)}`,
+      Sec.trunc(moodData.vibe, 100),
       6000,
     );
 
     /* ── STEP 2: Fetch movies ── */
-    await Movies.load(moodData.genreId, 1);
+    await Movies.load(moodData.genres, 1);
 
     _unlockFindBtn();
   },
@@ -721,7 +684,7 @@ const Movies = {
   async load(genreId, page) {
     const t2 = Toast.loading(
       "Finding your films…",
-      `Searching ${Sec.esc(State.moodAnalysis?.genre ?? "curated")} movies`,
+      `Searching ${Sec.esc(State.moodAnalysis?.genres ?? "curated")} movies`,
     );
 
     let data;
@@ -733,8 +696,8 @@ const Movies = {
       return;
     }
     Toast.dismiss(t2);
-
-    State.movies = data.results ?? [];
+    console.log("Movies API response:", data);
+    State.movies = data.recommendations ?? [];
     State.currentPage = data.page ?? page;
     State.totalPages = data.totalPages ?? 1;
     State.totalResults = data.totalResults ?? data.results?.length ?? 0;
@@ -754,11 +717,13 @@ const Movies = {
 
   renderBanner() {
     const m = State.moodAnalysis;
+    console.log("Rendering banner with mood analysis:", m);
+    
     if (!m) return;
     document.getElementById("mood-banner").innerHTML = `
       <div class="mood-banner__tag">✦ YOUR MOOD</div>
-      <div class="mood-banner__label">${Sec.esc(m.moodLabel)} · ${Sec.esc(m.genre)}</div>
-      <div class="mood-banner__desc">${Sec.esc(m.moodDescription)}</div>
+      <div class="mood-banner__label">${Sec.esc(m.mood)} · ${Sec.esc(m.genres)}</div>
+      <div class="mood-banner__desc">${Sec.esc(m.vibe)}</div>
     `;
     document.getElementById("results-meta").innerHTML = `
       Showing <strong>${State.movies.length}</strong> of
@@ -769,6 +734,8 @@ const Movies = {
 
   renderGrid() {
     const grid = document.getElementById("movies-grid");
+    const movie = State.movies;
+    console.log("First movie in results:", movie);
     grid.innerHTML = "";
 
     if (!State.movies.length) {

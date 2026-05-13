@@ -1,24 +1,20 @@
 import { BrevoClient } from '@getbrevo/brevo';
 import dotenv from "dotenv";
+import fs from "fs";
 
 dotenv.config();
 
+const templateContent = fs.readFileSync("./src/utilis/otp-email.html", "utf-8");
 const brevo = new BrevoClient({ apiKey: process.env.BREVO_API_KEY });
 
 
-export const sendOTPEmail = async (to, otp) => {
+export const sendOTPEmail = async (to, otp, name) => {
   try {
     const response = await brevo.transactionalEmails.sendTransacEmail({
       subject: "Your OTP Code",
-      htmlContent: `
-        <div>
-          <h2>Verify Your Account</h2>
-          <p>Your OTP is:</p>
-          <h1>${otp}</h1>
-        </div>
-      `,
+      htmlContent: templateContent.replace(/{{OTP_CODE}}/g, otp).replace(/{{USER_NAME}}/g, name).replace(/{{YEAR}}/g, new Date().getFullYear()),
       sender: { name: 'CineMood.ai', email: 'aisosamatthew247@gmail.com' },
-      to: [{ email: to}],
+      to: [{ email: to }],
     });
 
     console.log("EMAIL SENT:", response);
@@ -32,8 +28,6 @@ export const sendOTPEmail = async (to, otp) => {
     throw new Error("Failed to send OTP email");
   }
 };
-
-
 
 // SEND RESET PASSWORD EMAIL
 export const sendResetPasswordEmail = async (to, resetLink) => {

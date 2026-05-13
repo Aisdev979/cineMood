@@ -1,37 +1,52 @@
-async function fetchMovies(genreIds, keywords = []) {
-  const genreStr = genreIds.join("|");
+import dotenv from "dotenv";
+import fetch from "node-fetch";
 
-  // Get TMDB keyword IDs
-  const keywordIds = await Promise.all(
-    keywords.map(async (keyword) => {
-      try {
-        const res = await fetch(
-          `https://api.themoviedb.org/3/search/keyword?api_key=${STATE.tmdbKey}&query=${encodeURIComponent(keyword)}`
-        );
+dotenv.config();
 
-        const data = await res.json();
+console.log("TMDB API Token:", process.env.TMDB_API_TOKEN);
 
-        return data.results?.[0]?.id;
-      } catch {
-        return null;
-      }
-    })
-  );
+const options = {
+  headers: {
+    accept: "application/json",
+    Authorization: `Bearer ${process.env.TMDB_API_TOKEN}`,
+  },
+};
 
-  const keywordStr = keywordIds.filter(Boolean).join("|");
+async function getKeywordIds(words) {
+  const ids = [];
 
-  const pages = await Promise.all(
-    [1, 2].map((p) =>
-      fetch(
-        `https://api.themoviedb.org/3/discover/movie?api_key=${STATE.tmdbKey}&with_genres=${genreStr}&with_keywords=${keywordStr}&sort_by=vote_average.desc&vote_count.gte=80&page=${p}&language=en-US`
-      ).then((r) => r.json())
-    )
-  );
+  for (const word of words) {
+    const res = await fetch(
+      `https://api.themoviedb.org/3/search/keyword?query=${encodeURIComponent(word)}`,
+      options
+    );
 
-  let movies = pages.flatMap((p) => p.results || []);
+    const data = await res.json();
 
-  // Remove duplicates
-  movies = [...new Map(movies.map((m) => [m.id, m])).values()];
+    if (data.results?.length > 0) {
+      ids.push(data.results[0].id);
+    }
+  }
 
-  return movies.slice(0, 40);
+  return ids;
 }
+
+async function discoverMovies(genres = [18, 35], keywords = ["love", "friendship", "family"]) {
+  const keywordIds = await getKeywordIds(keywords);
+
+  console.log("Keyword IDs:", keywordIds);
+
+  const discoverUrl =
+    `https://api.themoviedb.org/3/discover/movie` +
+    `?with_genres=${genres.join(",")}` +
+    `&with_keywords=${keywordIds.join(",")}` +
+    `&sort_by=popularity.desc`;
+
+  const res = await fetch(discoverUrl, options);
+
+  const movies = await res.json();
+
+  return movies.results
+}
+
+export default discoverMovies

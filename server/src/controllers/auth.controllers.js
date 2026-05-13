@@ -27,7 +27,7 @@ export const registerUser = async (req, res) => {
     //if there isn't, create a new user and save it to the database
     const newUser = await User.create({ name, email, password, passwordConfirm, otp, otpExpires });
 
-    await sendOTPEmail(email, otp);
+    await sendOTPEmail(email, otp, newUser.name);
 
     //use jwt to create a access and refresh token and send it to the client
     const accessToken = jwt.sign({userId: newUser._id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'});

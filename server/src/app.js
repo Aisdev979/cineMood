@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from "cookie-parser";
 import authRouter from './routes/auth.routes.js';
+import moodAnalyzerRouter from './routes/moodanalyze.routes.js';
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use(
   
 app.use(express.json());
 app.use("/api/v1", authRouter);
+app.use("/api/v1/mood", moodAnalyzerRouter);
 
 // Example route
 app.get('/', (req, res) => {
