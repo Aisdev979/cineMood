@@ -1,34 +1,43 @@
 import jwt from "jsonwebtoken";
 
 export const protect = async (req, res, next) => {
-    try {
-        let token;
+  try {
+    let token;
 
-        console.log("Cookies in request:", req.cookie);
-
-        if (req.cookies && req.cookies.accessToken) {
-            token = req.cookies.accessToken;
-        }
-
-        console.log("Token from cookies:", token);
-
-        if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: "You are not logged in"
-            });
-        }
-
-        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-        req.user = decoded;
-
-        next();
-    } catch (error) {
-        return res.status(401).json({
-            success: false,
-            message: "Invalid token"
-        });
+    if (req.cookies && req.cookies.accessToken) {
+      token = req.cookies.accessToken;
     }
+
+    console.log("Access token from cookies:", token);
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "You are not logged in",
+      });
+    }
+
+    const decoded = jwt.verify(
+      token,
+      process.env.ACCESS_TOKEN_SECRET
+    );
+
+    req.user = decoded;
+
+    next();
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        message: "Access token expired",
+      });
+    }
+
+    return res.status(401).json({
+      success: false,
+      message: "Invalid token",
+    });
+  }
 };
 
 

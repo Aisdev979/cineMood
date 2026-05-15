@@ -104,6 +104,7 @@ const API = {
   if (body) opts.body = JSON.stringify(body);
 
   let res = await fetch(CFG.API_BASE + path, opts);
+  console.log(`API ${method} ${path} →`, res.status, res.ok);
 
   // If access token expired, try to refresh once
   if (res.status === 401) {
@@ -111,6 +112,8 @@ const API = {
       method: "POST",
       credentials: "include",
     });
+
+    console.log("Token refresh attempt, status:", refreshRes, refreshRes.ok);
 
     if (refreshRes.ok) {
       // Retry original request — browser now has new accessToken cookie
@@ -157,9 +160,9 @@ const API = {
   analyzeMood(text) {
     return API.post("/mood/analyze", { text });
   },
-  getMovies(genreId, page) {
+  getMovies(genreId, keywords, page) {
     return API.get(
-      `/mood/movies?genreId=${encodeURIComponent(genreId)}&page=${encodeURIComponent(page)}`,
+      `/mood/movies?genreId=${encodeURIComponent(genreId.join("|"))}&keywords=${encodeURIComponent(keywords.join("|"))}&page=${encodeURIComponent(page)}`,
     );
   },
   getMovie(id) {
@@ -663,7 +666,7 @@ const Home = {
     );
 
     /* ── STEP 2: Fetch movies ── */
-    await Movies.load(moodData.genres, 1);
+    await Movies.load(moodData.genreId, moodData.keywords, 1);
 
     _unlockFindBtn();
   },
@@ -681,15 +684,15 @@ function _unlockFindBtn() {
    MOVIES MODULE
    ════════════════════════════════════════════════ */
 const Movies = {
-  async load(genreId, page) {
+  async load(genreId, keywords, page) {
     const t2 = Toast.loading(
       "Finding your films…",
-      `Searching ${Sec.esc(State.moodAnalysis?.genres ?? "curated")} movies`,
+      `Searching ${Sec.esc(State.moodAnalysis?.genreId ?? "curated")} movies`,
     );
 
     let data;
     try {
-      data = await API.getMovies(genreId, page);
+      data = await API.getMovies(genreId, keywords, page);
     } catch (err) {
       Toast.dismiss(t2);
       Toast.error("Could not load movies", err.message);

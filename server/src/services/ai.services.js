@@ -1,10 +1,10 @@
-import { InferenceClient } from "@huggingface/inference";
+import { InferenceClient, InferenceClientProviderApiError } from "@huggingface/inference";
 
 const client = new InferenceClient(process.env.HUGGINGFACE_API_KEY);
 
 async function analyzeMoodWithHuggingFace(moodText) {
   const chatCompletion = await client.chatCompletion({
-    model: "deepseek-ai/DeepSeek-V4-Pro:fireworks-ai",
+    model: (e) ? "meta-llama/Llama-3.1-8B-Instruct:cerebras" : "meta-llama/Llama-3.1-8B-Instruct",
     temperature: 0.8,
     messages: [
       {
@@ -81,5 +81,12 @@ Return ONLY the JSON object.`,
   return parsed;
 }
 
+InferenceClientProviderApiError.prototype.toJSON = function () {
+  return {
+    name: this.name,
+    message: this.message,
+    stack: this.stack,
+  };
+};
 
 export default analyzeMoodWithHuggingFace;

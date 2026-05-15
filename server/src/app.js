@@ -11,7 +11,7 @@ const app = express();
 
 app.use(cookieParser());
 
-const allowedOrigins = ["http://127.0.0.1:5500", "https://aisdev979.github.io/cineMood"];
+const allowedOrigins = ["http://127.0.0.1:5500"];
 
 const options = {
   origin: (origin, callback) => {
