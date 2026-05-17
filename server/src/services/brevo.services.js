@@ -1,10 +1,20 @@
 import { BrevoClient } from '@getbrevo/brevo';
 import dotenv from "dotenv";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
-const templateContent = fs.readFileSync("./src/utilis/otp-email.html", "utf-8");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const templateContent = fs.readFileSync(
+  path.join(__dirname, "../utilis/otp-email.html"),
+  "utf-8"
+);
+
+console.log("Loaded email template content:", templateContent);
 const brevo = new BrevoClient({ apiKey: process.env.BREVO_API_KEY });
 
 
