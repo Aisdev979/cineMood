@@ -8,8 +8,6 @@ export const protect = async (req, res, next) => {
       token = req.cookies.accessToken;
     }
 
-    console.log("Access token from cookies:", token);
-
     if (!token) {
       return res.status(401).json({
         success: false,

@@ -11,7 +11,7 @@ const app = express();
 
 app.use(cookieParser());
 
-const allowedOrigins = ["http://127.0.0.1:5500"];
+const allowedOrigins = ["http://127.0.0.1:5500", "https://cine-mood-seven.vercel.app"];
 
 const options = {
   origin: (origin, callback) => {

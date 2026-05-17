@@ -122,8 +122,6 @@ export const verifyOtp = async (req, res) => {
 export const me = async (req, res) => {
   try {
     const { userId } = req.user;
-    console.log("Authenticated user ID:", userId);
-    
     const user = await User.findById(userId);
  
     if (!user) {
@@ -144,8 +142,6 @@ export const me = async (req, res) => {
  
 export const refreshToken = async (req, res) => {
   const token = req.cookies.refreshToken;
- 
-  console.log("Refresh attempt, token present:", token);
  
   if (!token) {
     return res.status(401).json({ message: "No refresh token" });

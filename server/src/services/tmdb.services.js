@@ -1,9 +1,4 @@
-import dotenv from "dotenv";
 import fetch from "node-fetch";
-
-dotenv.config();
-
-console.log("TMDB API Token:", process.env.TMDB_API_TOKEN);
 
 const options = {
   headers: {
@@ -15,7 +10,6 @@ const options = {
 async function getKeywordIds(words) {
   const ids = [];
   const arrWords = words.split("|")
-  console.log("Getting keyword IDs for words:", arrWords);
 
   for (const word of arrWords) {
     const res = await fetch(
@@ -33,10 +27,8 @@ async function getKeywordIds(words) {
   return ids;
 }
 
-export async function discoverMovies(genres = "35,18,12", keywords = ['friendship', 'family', 'love', 'adventure']) {
+export async function discoverMovies(genres, keywords) {
   const keywordIds = await getKeywordIds(keywords);
-
-    console.log("Keyword IDs:", keywordIds);
 
     const discoverUrl =
       `https://api.themoviedb.org/3/discover/movie` +
@@ -67,3 +59,16 @@ export async function getMovieDetailsFromTMDB(movieId) {
   }
 }
 
+export async function getMovieVideosFromTMDB(movieId) {
+  try {
+    const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/videos?language=en-US`, options);
+    if (!res.ok) {
+      throw new Error(`TMDB API error: ${res.status} ${res.statusText}`);
+    }
+    const videoDetails = await res.json();
+    return videoDetails;
+  } catch (error) {
+    console.error("Error fetching movie videos from TMDB:", error);
+    throw new Error("Failed to fetch movie videos");
+  }
+}

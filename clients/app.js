@@ -40,7 +40,7 @@
    CONFIG  – change API_BASE to match your server
    ════════════════════════════════════════════════ */
 const CFG = Object.freeze({
-  API_BASE: "http://localhost:5000/api/v1", // same-origin; no secret key here
+  API_BASE: "http://localhost:5000/api/v1",
   TMDB_IMG: "https://image.tmdb.org/t/p/w500",
   TMDB_IMG_ORIG: "https://image.tmdb.org/t/p/original",
   POSTER_FALLBACK: "https://placehold.co/500x750/111827/4d5578?text=No+Poster",
@@ -48,8 +48,8 @@ const CFG = Object.freeze({
     "https://placehold.co/1280x720/0c1020/4d5578?text=No+Backdrop",
   MAX_MOOD_LEN: 500,
   MIN_PASS_LEN: 8,
-  TOAST_DURATION: 4500, // ms for auto-dismiss (not loaders)
-  JUSTWATCH_BASE: "https://www.justwatch.com/us/search?q=",
+  TOAST_DURATION: 4500,
+  MOVIEBOX_BASE: "https://moviebox.ph/",
 });
 
 /* ════════════════════════════════════════════════
@@ -112,8 +112,6 @@ const API = {
       method: "POST",
       credentials: "include",
     });
-
-    console.log("Token refresh attempt, status:", refreshRes, refreshRes.ok);
 
     if (refreshRes.ok) {
       // Retry original request — browser now has new accessToken cookie
@@ -523,7 +521,6 @@ const Auth = {
     const tid = Toast.loading("Signing in…", "Verifying your credentials");
     try {
       const data = await API.login(email, password);
-      console.log("Login successful:", data);
       State.user = data.user;
       Toast.dismiss(tid);
       Toast.success(
@@ -648,7 +645,6 @@ const Home = {
     let moodData;
     try {
       moodData = await API.analyzeMood(text);
-      console.log("Mood analysis result:", moodData);
     } catch (err) {
       Toast.dismiss(t1);
       Toast.error("Analysis failed", err.message);
@@ -699,7 +695,6 @@ const Movies = {
       return;
     }
     Toast.dismiss(t2);
-    console.log("Movies API response:", data);
     State.movies = data.recommendations ?? [];
     State.currentPage = data.page ?? page;
     State.totalPages = data.totalPages ?? 1;
@@ -720,7 +715,6 @@ const Movies = {
 
   renderBanner() {
     const m = State.moodAnalysis;
-    console.log("Rendering banner with mood analysis:", m);
     
     if (!m) return;
     document.getElementById("mood-banner").innerHTML = `
@@ -738,7 +732,6 @@ const Movies = {
   renderGrid() {
     const grid = document.getElementById("movies-grid");
     const movie = State.movies;
-    console.log("First movie in results:", movie);
     grid.innerHTML = "";
 
     if (!State.movies.length) {
@@ -903,7 +896,7 @@ const Modal = {
         API.getVideos(id),
       ]);
       Toast.dismiss(t);
-      Modal._render(movie, videosData?.results ?? []);
+      Modal._render(movie?.movieDetails, videosData?.movieVideos ?? []);
     } catch (err) {
       Toast.dismiss(t);
       Toast.error("Could not load film", err.message);
@@ -937,15 +930,15 @@ const Modal = {
     const genres = Array.isArray(movie.genres) ? movie.genres : [];
 
     // Find best trailer (prefer YouTube Official Trailer, fall back to any YouTube)
-    const ytVideos = videos.filter(
+    const ytVideos = videos.results.filter(
       (v) =>
         v.site === "YouTube" && ["Trailer", "Teaser", "Clip"].includes(v.type),
     );
     const trailer =
       ytVideos.find((v) => v.type === "Trailer") || ytVideos[0] || null;
 
-    // JustWatch search link (legal streaming finder)
-    const jwUrl = CFG.JUSTWATCH_BASE + encodeURIComponent(movie.title ?? "");
+    // MovieBox search link (legal streaming finder)
+    const movieBoxUrl = `${CFG.MOVIEBOX_BASE}web/searchResult?keyword=${encodeURIComponent(movie.title ?? "")}`;
 
     // Build genres HTML safely
     const genresHtml = genres
@@ -1005,7 +998,7 @@ const Modal = {
           }
           <a
             class="btn-watch-where"
-            href="${Sec.esc(jwUrl)}"
+            href="${Sec.esc(movieBoxUrl)}"
             target="_blank"
             rel="noopener noreferrer">
             🍿 Where to Watch / Download

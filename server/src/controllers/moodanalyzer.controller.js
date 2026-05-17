@@ -1,14 +1,13 @@
-import { discoverMovies, getMovieDetailsFromTMDB } from "../services/tmdb.services.js";
-import analyzeMoodWithHuggingFace from "../services/ai.services.js";
+import { discoverMovies, getMovieDetailsFromTMDB, getMovieVideosFromTMDB } from "../services/tmdb.services.js";
+import { getGroqChatCompletion } from "../services/ai.services.js";
 
 export const analyzeMood = async (req, res) => {
   try {
     const { text } = req.body;
-    console.log("Received mood text for analysis:", text);
-    const moodAnalysis = await analyzeMoodWithHuggingFace(text);
-    console.log("Mood Analysis Result:", moodAnalysis);
+    const moodAnalysis = await getGroqChatCompletion(text);
 
-    res.json({
+    res.status(200).json({
+      success: true,
       mood: moodAnalysis.mood,
       genreId: moodAnalysis.genres,
       keywords: moodAnalysis.keywords,
@@ -23,13 +22,10 @@ export const analyzeMood = async (req, res) => {
 
 export const getMovieRecommendations = async (req, res) => {
     try {
-      console.log("Received request for movie recommendations with query:", req.query);
         const { genreId, keywords } = req.query;
-        console.log("Received genreId:", genreId);
-        console.log("Received keywords:", keywords);
         const movieRecommendations = await discoverMovies(genreId, keywords);
-        console.log("Movie Recommendations:", movieRecommendations[0].id);
-        res.json({
+        res.status(200).json({
+          success: true,
           totalResults: movieRecommendations.length || 0,
           recommendations: movieRecommendations || []
         });
@@ -43,12 +39,27 @@ export const getMovieRecommendations = async (req, res) => {
 export const getMovieDetails = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("Received request for movie details with movieId:", id);
     const movieDetails = await getMovieDetailsFromTMDB(id);
-    console.log("Movie Details:", movieDetails);
-    res.json(movieDetails);
+    res.status(200).json({
+      success: true,
+      movieDetails
+    });
   } catch (error) {
     console.error("Error getting movie details:", error);
     res.status(500).json({ error: "Failed to get movie details" });
   } 
+};
+
+export const getMovieVideos = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const movieVideos = await getMovieVideosFromTMDB(id);
+    res.status(200).json({
+      success: true,
+      movieVideos
+    });
+  } catch (error) {
+    console.error("Error getting movie videos:", error);
+    res.status(500).json({ error: "Failed to get movie videos" });
+  }
 };
