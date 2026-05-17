@@ -40,7 +40,7 @@
    CONFIG  – change API_BASE to match your server
    ════════════════════════════════════════════════ */
 const CFG = Object.freeze({
-  API_BASE: "http://localhost:5000/api/v1",
+  API_BASE: "/api/v1",
   TMDB_IMG: "https://image.tmdb.org/t/p/w500",
   TMDB_IMG_ORIG: "https://image.tmdb.org/t/p/original",
   POSTER_FALLBACK: "https://placehold.co/500x750/111827/4d5578?text=No+Poster",
