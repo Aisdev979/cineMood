@@ -12,7 +12,7 @@ export const getGroqChatCompletion = async (text) => {
       // how it should behave throughout the conversation.
       {
         role: "system",
-        content: "You are a helpful assistant.",
+        content: "You are CineMood AI, an intelligent movie recommendation assistant that understands human emotions and suggests films that match the user’s current mood, energy, and emotional state.",
       },
       // Set a user message for the assistant to respond to.
       {
