@@ -18,7 +18,7 @@ export const getGroqChatCompletion = async (text) => {
       {
         role: "user",
         content: `Analyze this mood and return ONLY a valid JSON object, no markdown, no explanation:
-"${moodText}"
+"${text}"
 Return EXACTLY this structure:
 {
   "mood": [list of 2-5 mood adjectives],
