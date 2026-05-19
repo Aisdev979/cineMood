@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from "cookie-parser";
 import authRouter from './routes/auth.routes.js';
 import moodAnalyzerRouter from './routes/moodanalyze.routes.js';
+import errorMiddleware from './middlewares/error.middlewares.js';
 
 dotenv.config();
 
@@ -37,6 +38,8 @@ app.use("/api/v1/mood", moodAnalyzerRouter);
 app.get('/', (req, res) => {
   res.send('Welcome to the CineMood API!');
 });
+
+app.use(errorMiddleware);
 
 
 export default app;

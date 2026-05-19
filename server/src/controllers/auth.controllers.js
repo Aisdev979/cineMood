@@ -12,16 +12,16 @@ const cookieOptions = {
   sameSite: isProd ? "none" : "lax", // "none" allows cross-origin cookies on GitHub Pages
 };
  
-export const registerUser = async (req, res) => {
-  const { name, email, password, passwordConfirm } = req.body;
+export const registerUser = async (req, res, next) => {
+  try {
+    const { name, email, password, passwordConfirm } = req.body;
  
   const user = await User.findOne({ email });
  
   if (user) {
-    return res.status(400).json({
-      success: false,
-      message: 'User with this email already exist, please login'
-    });
+    const error = new Error("User already exists");
+    error.status = 400;
+    throw error;
   }
  
   const otp = generateOTP();
@@ -43,27 +43,30 @@ export const registerUser = async (req, res) => {
     newUser,
     accessToken
   });
+  } catch (error) {
+    console.error("Error in registerUser:", error);
+    next(error); // Pass the error to the error handling middleware
+  }
 };
- 
-export const signInUser = async (req, res) => {
-  const { email, password } = req.body;
+
+export const signInUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
  
   const user = await User.findOne({ email }).select("+password");
  
   if (!user) {
-    return res.status(404).json({
-      success: false,
-      message: "User not found"
-    });
+    const error = new Error("User not found");
+    error.status = 404;
+    throw error;
   }
  
   const comparePassword = await bcrypt.compare(password, user.password);
  
   if (!comparePassword) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid email or password"
-    });
+    const error = new Error("Invalid email or password");
+    error.status = 400;
+    throw error;
   }
  
   const accessToken = jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
@@ -78,32 +81,34 @@ export const signInUser = async (req, res) => {
     user,
     accessToken
   });
+  } catch (error) {
+    console.error("Error in signInUser:", error);
+    next(error); // Pass the error to the error handling middleware
+  }
 };
- 
-export const verifyOtp = async (req, res) => {
-  const { email, otp } = req.body;
+
+export const verifyOtp = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
  
   const user = await User.findOne({ email }).select("+otp +otpExpires");
  
   if (!user) {
-    return res.status(404).json({
-      success: false,
-      message: "User not found"
-    });
+    const error = new Error("User not found");
+    error.status = 404;
+    throw error;
   }
  
   if (user.otp !== otp) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid OTP"
-    });
+    const error = new Error("Invalid OTP");
+    error.status = 400;
+    throw error;
   }
  
   if (user.otpExpires < Date.now()) {
-    return res.status(400).json({
-      success: false,
-      message: "OTP expired"
-    });
+    const error = new Error("OTP expired");
+    error.status = 400;
+    throw error;
   }
  
   user.otp = null;
@@ -117,34 +122,40 @@ export const verifyOtp = async (req, res) => {
     message: "OTP verified successfully",
     user
   });
+  } catch (error) {
+    console.error("Error in verifyOtp:", error);
+    next(error); // Pass the error to the error handling middleware
+  }
 };
- 
-export const me = async (req, res) => {
+
+export const me = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const user = await User.findById(userId);
  
     if (!user) {
-      return res.status(404).json({
-        status: false,
-        message: "User not found"
-      });
+      const error = new Error("User not found");
+      error.status = 404;
+      throw error;
     }
  
     return res.json({
       status: true,
       user
     });
-  } catch (err) {
-    return res.status(401).json({ message: "Invalid token" });
+  } catch (error) {
+    console.error("Error in me:", error);
+    next(error); // Pass the error to the error handling middleware
   }
 };
- 
-export const refreshToken = async (req, res) => {
+
+export const refreshToken = async (req, res, next) => {
   const token = req.cookies.refreshToken;
  
   if (!token) {
-    return res.status(401).json({ message: "No refresh token" });
+    const error = new Error("No refresh token provided");
+    error.status = 401;
+    throw error;
   }
  
   try {
@@ -159,15 +170,24 @@ export const refreshToken = async (req, res) => {
     res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 60 * 60 * 1000 });
 
     return res.json({ success: true, accessToken });
-  } catch (err) {
-    return res.status(401).json({ message: "Refresh expired" });
+  } catch (error) {
+    console.error("Error in refreshToken:", error);
+    next(error); // Pass the error to the error handling middleware
   }
 };
  
-export const logout = async (req, res) => {
-  // clearCookie options must match the options used when setting the cookie
-  res.clearCookie("accessToken", cookieOptions);
-  res.clearCookie("refreshToken", cookieOptions);
- 
-  return res.json({ message: "Logged out" });
+export const logout = async (req, res, next) => {
+  try {
+    // clearCookie options must match the options used when setting the cookie
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
+
+    return res.json({
+      success: true,
+      message: "Logged out"
+    });
+  } catch (error) {
+    console.error("Error in logout:", error);
+    next(error); // Pass the error to the error handling middleware
+  }
 };

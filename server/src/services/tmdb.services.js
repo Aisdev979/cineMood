@@ -47,7 +47,7 @@ export async function discoverMovies(genres, keywords) {
 
 export async function getMovieDetailsFromTMDB(movieId) {
   try {
-    const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?video=true&language=en-US`, options);
+    const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?language=en-US`, options);
     if (!res.ok) {
       throw new Error(`TMDB API error: ${res.status} ${res.statusText}`);
     }
