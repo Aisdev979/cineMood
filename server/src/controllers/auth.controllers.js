@@ -68,6 +68,13 @@ export const signInUser = async (req, res, next) => {
     error.status = 400;
     throw error;
   }
+
+ if (user.isVerified !== true) {
+   return res.status(400).json({
+    success: false,
+    message: "Unverified, please verify your account"
+   })
+ }
  
   const accessToken = jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
   const refreshToken = jwt.sign({ userId: user._id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '3d' });
