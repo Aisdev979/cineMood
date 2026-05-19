@@ -14,7 +14,6 @@ const templateContent = fs.readFileSync(
   "utf-8"
 );
 
-console.log("Loaded email template content:", templateContent);
 const brevo = new BrevoClient({ apiKey: process.env.BREVO_API_KEY });
 
 

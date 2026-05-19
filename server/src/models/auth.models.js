@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       select: false,
-      match: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, "Please use a stronger password, must be at least 8 characters and include uppercase, lowercase, number and special character(@$!%*?&)"],
     },
 
     passwordConfirm: {
@@ -69,14 +69,6 @@ userSchema.pre("save", async function () {
 
   this.passwordConfirm = undefined;
 });
-
-
-// /* =========================
-//    PASSWORD COMPARISON
-// ========================= */
-// userSchema.methods.comparePassword = async function (candidatePassword) {
-//   return await bcrypt.compare(candidatePassword, this.password);
-// };
 
 const User = mongoose.model("User", userSchema);
 
