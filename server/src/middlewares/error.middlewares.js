@@ -1,7 +1,6 @@
 const errorMiddleware = (err, req, res, next) => {
 
-	 try {
-        // Mongoose bad objectId
+	// Mongoose bad objectId
     if (err.name === "CastError") {
         err = new Error("Resource not found");
         err.status = 404;
@@ -26,15 +25,6 @@ const errorMiddleware = (err, req, res, next) => {
 		status: "error",
 		message: message,
 	});
-
-    next();
-    } catch (error) {
-        console.error("Error in errorMiddleware:", error);
-        res.status(500).json({
-            status: "error",
-            message: "An unexpected error occurred in the error handling middleware.",
-        });
-    }
 };
 
 export default errorMiddleware;
